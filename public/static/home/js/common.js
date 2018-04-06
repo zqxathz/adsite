@@ -8,15 +8,25 @@ var infoWin;
 function geocoder() {
 
     var _onGeoGetLocation = function(e){
-        console.log(e);
+        loc = e.geocodes[0].location;
         amap = new AMap.Map('container', {
             resizeEnable: true,
             zoom: 15,
             center: e.geocodes[0].location,
         });
+
+        amap.plugin(["AMap.ToolBar"],function(){
+            //加载工具条
+            var tool = new AMap.ToolBar();
+            amap.addControl(tool);
+        });
+
         var marker = new AMap.Marker({
             position: e.geocodes[0].location,
-            title: site
+            title: site,
+            zIndex:9999,
+            clickable:true,
+            bubble:true,
         });
         marker.setMap(amap);
     };
@@ -32,7 +42,7 @@ function geocoder() {
 
     geocoder.getLocation(site, function(status, result) {
         if (status === 'complete' && result.info === 'OK') {
-            console.log(result.geocodes[0].location.getLng()+','+result.geocodes[0].location.getLat());
+            //console.log(result.geocodes[0].location.getLng()+','+result.geocodes[0].location.getLat());
             //loc = result.geocodes[0].location;
 
             //return result.geocodes[0].location;//[result.geocodes[0].location.getLng(),result.geocodes[0].location.getLat()];
@@ -84,7 +94,9 @@ function createVisualMap(data) {
         infoWin.open(map.getMap(), new AMap.LngLat(lnglat[0], lnglat[1]));
     });
 
+    //layer.setZIndex(10);
     layer.render();
+
 }
 
 
