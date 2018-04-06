@@ -55,7 +55,6 @@ class Index extends Controller
 			    $i=-1;
 		    }
 	    }
-
 	    if (!empty($a)){
 		    $a=mb_substr($a,1);
 
