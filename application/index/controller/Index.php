@@ -20,7 +20,9 @@ class Index extends Controller
         header("Content-type: text/html; charset=utf-8");
     	$data = $this->request->post();
 
+
     	$area_array= explode("\n",$data['two']);
+
 
     	$d = $this->getlocation($area_array);
     	$result['response']='success';
@@ -47,14 +49,20 @@ class Index extends Controller
 			    $output = curl_exec($ch);
 			    curl_close($ch);
 			    $output_array = json_decode($output);
-			    foreach ($output_array->geocodes as $item1){
-				    $b[$c]['name']=$item1->formatted_address;
-				    $b[$c]['center']=$item1->location;
-				    $c++;
-			    }
+			    if ($output_array){
+                    foreach ($output_array->geocodes as $item1){
+                        if (!empty($item1->location)){
+                            $b[$c]['name']=$item1->formatted_address;
+                            $b[$c]['center']=$item1->location;
+                            $c++;
+                        }
+
+                    }
+                }
 			    $i=-1;
 		    }
 	    }
+
 	    if (!empty($a)){
 		    $a=mb_substr($a,1);
 

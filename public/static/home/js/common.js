@@ -1,36 +1,49 @@
 var loc;
 var amap;
 var loaded = false;
-var site = '卓刀泉古玩珠宝城';
+var site = '武汉国际会展中心';
 var layer;
 var infoWin;
+var maker;
 
-function geocoder() {
+function geocoder(data) {
+    if (!data){
+        return;
+    }
 
-    var _onGeoGetLocation = function(e){
+    var _onGeoGetLocation = function(e)
+    {
         loc = e.geocodes[0].location;
-        amap = new AMap.Map('container', {
-            resizeEnable: true,
-            zoom: 15,
-            center: e.geocodes[0].location,
-        });
+        if (!amap){
+            amap = new AMap.Map('container', {
+                resizeEnable: true,
+                zoom: 15,
+                center: e.geocodes[0].location,
+            });
 
-        amap.plugin(["AMap.ToolBar"],function(){
-            //加载工具条
-            var tool = new AMap.ToolBar();
-            amap.addControl(tool);
-        });
+            amap.plugin(["AMap.ToolBar"],function(){
+                //加载工具条
+                var tool = new AMap.ToolBar();
+                amap.addControl(tool);
+            });
+        }else{
+            amap.setCenter(e.geocodes[0].location);
+        }
 
-        var marker = new AMap.Marker({
-            position: e.geocodes[0].location,
-            title: site,
-            zIndex:9999,
-            clickable:true,
-            bubble:true,
-        });
-        marker.setMap(amap);
+        if (!maker){
+            marker = new AMap.Marker({
+                position: e.geocodes[0].location,
+                title: site,
+                zIndex:9999,
+                clickable:true,
+                bubble:true,
+            });
+            marker.setMap(amap);
+        }else{
+            marker.setPosition(e.geocodes[0].location);
+        }
+
     };
-
 
     var geocoder = new AMap.Geocoder({
         city: "武汉", //城市，默认：“全国”
@@ -40,7 +53,7 @@ function geocoder() {
     var clickListener = AMap.event.addListener(geocoder, "complete", _onGeoGetLocation); //绑定事件，返回监听对象
 
 
-    geocoder.getLocation(site, function(status, result) {
+    geocoder.getLocation(data, function(status, result) {
         if (status === 'complete' && result.info === 'OK') {
             //console.log(result.geocodes[0].location.getLng()+','+result.geocodes[0].location.getLat());
             //loc = result.geocodes[0].location;
@@ -86,9 +99,9 @@ function createVisualMap(data) {
         // 原始鼠标事件
         var originalEvent = event.originalEvent;
         var lnglat = event.lnglat;
-        console.log('事件类型 ' + type);
+        /*console.log('事件类型 ' + type);
         console.log('原始数据 ' + JSON.stringify(rawData));
-        console.log('鼠标事件 ' + originalEvent);
+        console.log('鼠标事件 ' + originalEvent);*/
 
         infoWin.setContent(rawData.name + '<br/>' + rawData.center);
         infoWin.open(map.getMap(), new AMap.LngLat(lnglat[0], lnglat[1]));
@@ -99,12 +112,19 @@ function createVisualMap(data) {
 
 }
 
+function setlist(data) {
+  $(".list-group").append();
+
+}
 
 
 
 $(function () {
     $(".pushdata").on("click",function(e){
+        site = $("#one").val();
+        geocoder(site);
         if ($("#two").val()!=""){
+            alert('aaa');
             $.ajax({
                 type: "POST",
                 url: window.location.protocol+'//'+window.location.host + '/index.php/index/index/get',
@@ -116,6 +136,7 @@ $(function () {
                     if (data.response == "success") {
                         console.log(data.data);
                         createVisualMap(data.data);
+                        //setlist(data.data);
                     }else{
 
                     }

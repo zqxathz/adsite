@@ -2,38 +2,49 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Title</title>
-    <style>
-
-    </style>
+    <title>户外广告点位查询地图</title>
+    <!--<link href="https://cdn.bootcss.com/bootstrap/3.1.1/css/bootstrap.css" rel="stylesheet" type="text/css" />-->
+    <link href="__HOME_CSS__/bootstrap.min.css" rel="stylesheet">
     <link href="__HOME_CSS__/style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-   <div>
-       <div>
-           <form action="/index.php/index/index/get" method="post">
-               <div>
-                   <label for="one">输入当前城市:</label>
-                   <br/>
-                   <input type="text" name="one" id="one">
-               </div>
-               <div>
-                   <label for="two">输入地点信息:(一行一个)</label>
-                   <br/>
-                   <textarea name="two" style="width: 500px;height: 300px" id="two"></textarea>
+   <div style="padding: 10px">
+       <div class="row">
+           <div class="col-md-4" style="overflow: scroll">
+               <form action="/index.php/index/index/get" method="post">
+                   <div>
+                       <label for="one">输入展会地点:</label>
+                       <br/>
+                       <input type="text" name="one" id="one" value="武汉国际会展中心">
+                       <!--<button type="button" id="setplace">确定</button>-->
+                   </div>
+                   <div>
+                       <label for="two">输入地点信息:(一行一个)</label>
+                       <br/>
+                       <textarea name="two" style="width: 100%;height: 300px" id="two"></textarea>
+                   </div>
+                   <div style="text-align: right">
+                       <button type="button" class="btn btn-primary pushdata" role="button">提交</button>
+                   </div>
+                   <div>
+                       <div class="list-group">
+                           <!--<a href="#" class="list-group-item list-group-item-action active">
+                               Cras justo odio
+                           </a>-->
 
+                       </div>
+                   </div>
+               </form>
+           </div>
+           <div class="col-md-8">
+               <div id="container" class="container">
                </div>
-
-               <button type="button" class="pushdata">提交</button>
-           </form>
+           </div>
        </div>
-
    </div>
-   <div id="container" class="container">
-   </div>
-
-
    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+   <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
+   <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
    <script src="http://webapi.amap.com/maps?v=1.4.2&key=1852ab96a1ef3461676903e5c360aaf5&plugin=AMap.Geocoder"></script>
    <script src="http://webapi.amap.com/loca?key=1852ab96a1ef3461676903e5c360aaf5"></script>
    <script src="http://a.amap.com/Loca/static/mock/districts.js"></script>
