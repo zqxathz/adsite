@@ -33,12 +33,7 @@ class Index extends Controller
 
     private function getlocation($data,$city=''){
     	define("AMAP_URL", 'http://restapi.amap.com/v3/geocode/geo?key=aa3d69b27a7fb90c88cf383140fdf165&address=%s&city=%c&batch=true');
-
-
-
-    	//$city="wuhan";
         $url2 = str_replace('%c',$city,AMAP_URL);
-
 
     	$a = ''; $i = 0; $c = 0;
     	$b= [];
