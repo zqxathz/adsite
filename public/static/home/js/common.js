@@ -4,15 +4,103 @@ var loaded = false;
 var site = '武汉国际会展中心';
 var layer;
 var infoWin;
-var maker;
+var marker = {};
+
+var text_maker_array = new Array();
 
 function geocoder(data) {
     if (!data){
         return;
     }
 
+    var city = '';
+    var onSearch = function(e){
+      console.log(e.poiList.count);
+
+      if (e.poiList.count=0){
+          return;
+      }
+      loc = e.poiList.pois[0].location;
+        if (!amap){
+            amap = new AMap.Map('container', {
+                resizeEnable: true,
+                zoom: 15,
+                center: loc,
+            });
+
+            amap.plugin(["AMap.ToolBar"],function(){
+                //加载工具条
+                var tool = new AMap.ToolBar();
+                amap.addControl(tool);
+            });
+
+
+        }else{
+            amap.setCenter(loc);
+        }
+
+
+        if ($.isEmptyObject(marker)){
+            marker = new AMap.Marker({
+                position: loc,
+                title: site,
+                zIndex:9999,
+                clickable:true,
+                bubble:true,
+            });
+            marker.setMap(amap);
+        }else{
+            marker.setPosition(loc);
+        }
+
+
+        amap.getCity(function(result){
+            city = result.citycode;
+            console.log(city);
+            if ($("#two").val()!="") {
+                //alert('aaa');
+                $.ajax({
+                    type: "POST",
+                    url: window.location.protocol + '//' + window.location.host + '/index.php/index/index/get',
+                    data: {
+                        "two": $("#two").val(),
+                        "city": city
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.response == "success") {
+                            //console.log(data.data);
+                            //createTitle(data.data);
+                            pos_data = data.data;
+                            $("[name='my-checkbox']").bootstrapSwitch('disabled', false, false);
+                            createVisualMap(data.data);
+                            //setlist(data.data);
+                        } else {
+
+                        }
+                    },
+                    error: function (jqXHR, textStatus) {
+                        alert(jqXHR.status + ':' + jqXHR.statusText);
+                    },
+                    complete: function () {
+
+                    }
+                });
+
+            }
+        });
+
+
+
+
+
+    };
+
     var _onGeoGetLocation = function(e)
     {
+
+
         loc = e.geocodes[0].location;
         if (!amap){
             amap = new AMap.Map('container', {
@@ -26,11 +114,13 @@ function geocoder(data) {
                 var tool = new AMap.ToolBar();
                 amap.addControl(tool);
             });
+
+
         }else{
             amap.setCenter(e.geocodes[0].location);
         }
 
-        if (!maker){
+        if ($.isEmptyObject(marker)){
             marker = new AMap.Marker({
                 position: e.geocodes[0].location,
                 title: site,
@@ -46,11 +136,11 @@ function geocoder(data) {
     };
 
     var geocoder = new AMap.Geocoder({
-        city: "武汉", //城市，默认：“全国”
-        radius: 500 //范围，默认：500
+       // city: "武汉", //城市，默认：“全国”
+        radius: 1500 //范围，默认：500
     });
 
-    var clickListener = AMap.event.addListener(geocoder, "complete", _onGeoGetLocation); //绑定事件，返回监听对象
+   /*var clickListener = AMap.event.addListener(geocoder, "complete", _onGeoGetLocation); //绑定事件，返回监听对象
 
 
     geocoder.getLocation(data, function(status, result) {
@@ -60,7 +150,63 @@ function geocoder(data) {
 
             //return result.geocodes[0].location;//[result.geocodes[0].location.getLng(),result.geocodes[0].location.getLat()];
         }
+    });*/
+
+
+    //构造地点查询类
+    var placeSearch = new AMap.PlaceSearch({
+        pageSize: 1, // 单页显示结果条数
+        pageIndex: 1, // 页码
     });
+        //关键字查询
+    var clickListener = AMap.event.addListener(placeSearch, "complete", onSearch); //绑定事件，返回监听对象
+
+    placeSearch.search(data);
+}
+
+function createTitle(data) {
+    // 创建纯文本标记
+
+    if ($("[name='my-checkbox']").prop("checked") == false){
+
+       amap.remove(text_maker_array);
+       text_maker_array=[];
+       return;
+    }
+    for (var i = 0; i < data.length; i++) {
+
+        pos_array=data[i].center.split(",");
+        var text = new AMap.Text({
+            text:data[i].name,
+            anchor:'center', // 设置文本标记锚点
+            draggable:false,
+            cursor:'pointer',
+            angle:0,
+            offset: new AMap.Pixel(0, -20),
+            style:{
+                'padding': '.25rem 0.25rem',
+                'margin-bottom': '0.2rem',
+                'border-radius': '.25rem',
+                'background-color': 'white',
+                //'width': '15rem',
+                'border-width': 0,
+                'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+                'text-align': 'center',
+                'font-size': '4px',
+                'color': 'blue'
+            },
+            position: [pos_array[0],pos_array[1]]
+        });
+        text.setMap(amap);
+        text_maker_array.push(text);
+
+    }
+
+
+
+
+
+
 }
 
 function createVisualMap(data) {
@@ -120,40 +266,38 @@ function setlist(data) {
 
 
 $(function () {
-    $(".pushdata").on("click",function(e){
-        site = $("#one").val();
-        geocoder(site);
-        if ($("#two").val()!=""){
-            alert('aaa');
-            $.ajax({
-                type: "POST",
-                url: window.location.protocol+'//'+window.location.host + '/index.php/index/index/get',
-                data: {
-                    "two" : $("#two").val(),
-                },
-                dataType: "json",
-                success: function(data){
-                    if (data.response == "success") {
-                        console.log(data.data);
-                        createVisualMap(data.data);
-                        //setlist(data.data);
-                    }else{
 
-                    }
-                },
-                error: function(jqXHR, textStatus){
-                    alert(jqXHR.status+':'+jqXHR.statusText);
-                },
-                complete:function(){
+    //$("[name='my-checkbox']").attr("disabled","true");
+    $("[name='my-checkbox']").bootstrapSwitch({
+        disabled:true
+    });
 
-                }
-            });
+    var auto = new AMap.Autocomplete({
+        input: "one"
+    });
 
-        }
+    $("[name='my-checkbox']").on('switchChange.bootstrapSwitch', function (e, state) {
+
+        console.log(state);
+
+        createTitle(pos_data);
 
     });
 
-    geocoder();
+    $(".pushdata").on("click",function(e){
+        site = $("#one").val();
+        geocoder(site);
+
+        /*amap.getCity(function(result){
+           city = result.city;
+        });*/
+
+
+
+
+    });
+
+    //geocoder();
 
 
 
