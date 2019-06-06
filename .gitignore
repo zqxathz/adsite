@@ -4,3 +4,8 @@
 *.log
 thinkphp
 .env
+/.htaccess
+/.user.ini
+/index.html
+/404.html
+/composer.phar
