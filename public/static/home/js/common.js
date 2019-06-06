@@ -8,160 +8,123 @@ var marker = {};
 
 var text_maker_array = new Array();
 
+function getcity_map(){
+    var p = new Promis(function (resolve,reject) {
+
+    })
+}
+
 function geocoder(data) {
-    if (!data){
-        return;
-    }
-
-    var city = '';
-    var onSearch = function(e){
-      console.log(e.poiList.count);
-
-      if (e.poiList.count=0){
-          return;
-      }
-      loc = e.poiList.pois[0].location;
-        if (!amap){
-            amap = new AMap.Map('container', {
-                resizeEnable: true,
-                zoom: 15,
-                center: loc,
-            });
-
-            amap.plugin(["AMap.ToolBar"],function(){
-                //加载工具条
-                var tool = new AMap.ToolBar();
-                amap.addControl(tool);
-            });
-
-
-        }else{
-            amap.setCenter(loc);
+    var p = new Promise(function(resolve,reject){
+        if (!data){
+            return;
         }
+        console.log(data);
 
+        var city = '';
+        var onSearch = function(e){
+            console.log(e.poiList.count);
+            if (e.poiList.count=0){
+                return;
+            }
+            loc = e.poiList.pois[0].location;
+            if (!amap){
+                amap = new AMap.Map('container', {
+                    resizeEnable: true,
+                    zoom: 15,
+                    center: loc
+                });
+                amap.plugin(["AMap.ToolBar"],function(){
+                    //加载工具条
+                    var tool = new AMap.ToolBar();
+                    amap.addControl(tool);
+                });
+            }else{
+                amap.setCenter(loc);
+            }
 
-        if ($.isEmptyObject(marker)){
-            marker = new AMap.Marker({
-                position: loc,
-                title: site,
-                zIndex:9999,
-                clickable:true,
-                bubble:true,
-            });
-            marker.setMap(amap);
-        }else{
-            marker.setPosition(loc);
-        }
+            if ($.isEmptyObject(marker)){
+                marker = new AMap.Marker({
+                    position: loc,
+                    title: site,
+                    zIndex:9999,
+                    clickable:true,
+                    bubble:true,
+                });
+                marker.setMap(amap);
+            }else{
+                marker.setPosition(loc);
+            }
 
+            resolve(amap);
+        };
 
-        amap.getCity(function(result){
-            city = result.citycode;
-            console.log(city);
-            if ($("#two").val()!="") {
-                //alert('aaa');
-                $.ajax({
-                    type: "POST",
-                    url: window.location.protocol + '//' + window.location.host + '/index.php/index/index/get',
-                    data: {
-                        "two": $("#two").val(),
-                        "city": city
-
-                    },
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.response == "success") {
-                            //console.log(data.data);
-                            //createTitle(data.data);
-                            pos_data = data.data;
-                            $("[name='my-checkbox']").bootstrapSwitch('disabled', false, false);
-                            createVisualMap(data.data);
-                            //setlist(data.data);
-                        } else {
-
-                        }
-                    },
-                    error: function (jqXHR, textStatus) {
-                        alert(jqXHR.status + ':' + jqXHR.statusText);
-                    },
-                    complete: function () {
-
-                    }
+        var _onGeoGetLocation = function(e)
+        {
+            loc = e.geocodes[0].location;
+            if (!amap){
+                amap = new AMap.Map('container', {
+                    resizeEnable: true,
+                    zoom: 15,
+                    center: e.geocodes[0].location,
                 });
 
+                amap.plugin(["AMap.ToolBar"],function(){
+                    //加载工具条
+                    var tool = new AMap.ToolBar();
+                    amap.addControl(tool);
+                });
+
+
+            }else{
+                amap.setCenter(e.geocodes[0].location);
             }
+
+            if ($.isEmptyObject(marker)){
+                marker = new AMap.Marker({
+                    position: e.geocodes[0].location,
+                    title: site,
+                    zIndex:9999,
+                    clickable:true,
+                    bubble:true,
+                });
+                marker.setMap(amap);
+            }else{
+                marker.setPosition(e.geocodes[0].location);
+            }
+
+        };
+
+        /*var geocoder = new AMap.Geocoder({
+            // city: "武汉", //城市，默认：“全国”
+            radius: 1500 //范围，默认：500
+        });*/
+
+        /*var clickListener = AMap.event.addListener(geocoder, "complete", _onGeoGetLocation); //绑定事件，返回监听对象
+
+
+         geocoder.getLocation(data, function(status, result) {
+             if (status === 'complete' && result.info === 'OK') {
+                 //console.log(result.geocodes[0].location.getLng()+','+result.geocodes[0].location.getLat());
+                 //loc = result.geocodes[0].location;
+
+                 //return result.geocodes[0].location;//[result.geocodes[0].location.getLng(),result.geocodes[0].location.getLat()];
+             }
+         });*/
+        //构造地点查询类
+        var placeSearch = new AMap.PlaceSearch({
+            pageSize: 1, // 单页显示结果条数
+            pageIndex: 1, // 页码
         });
-
-
-
-
-
-    };
-
-    var _onGeoGetLocation = function(e)
-    {
-
-
-        loc = e.geocodes[0].location;
-        if (!amap){
-            amap = new AMap.Map('container', {
-                resizeEnable: true,
-                zoom: 15,
-                center: e.geocodes[0].location,
-            });
-
-            amap.plugin(["AMap.ToolBar"],function(){
-                //加载工具条
-                var tool = new AMap.ToolBar();
-                amap.addControl(tool);
-            });
-
-
-        }else{
-            amap.setCenter(e.geocodes[0].location);
-        }
-
-        if ($.isEmptyObject(marker)){
-            marker = new AMap.Marker({
-                position: e.geocodes[0].location,
-                title: site,
-                zIndex:9999,
-                clickable:true,
-                bubble:true,
-            });
-            marker.setMap(amap);
-        }else{
-            marker.setPosition(e.geocodes[0].location);
-        }
-
-    };
-
-    var geocoder = new AMap.Geocoder({
-       // city: "武汉", //城市，默认：“全国”
-        radius: 1500 //范围，默认：500
-    });
-
-   /*var clickListener = AMap.event.addListener(geocoder, "complete", _onGeoGetLocation); //绑定事件，返回监听对象
-
-
-    geocoder.getLocation(data, function(status, result) {
-        if (status === 'complete' && result.info === 'OK') {
-            //console.log(result.geocodes[0].location.getLng()+','+result.geocodes[0].location.getLat());
-            //loc = result.geocodes[0].location;
-
-            //return result.geocodes[0].location;//[result.geocodes[0].location.getLng(),result.geocodes[0].location.getLat()];
-        }
-    });*/
-
-
-    //构造地点查询类
-    var placeSearch = new AMap.PlaceSearch({
-        pageSize: 1, // 单页显示结果条数
-        pageIndex: 1, // 页码
-    });
         //关键字查询
-    var clickListener = AMap.event.addListener(placeSearch, "complete", onSearch); //绑定事件，返回监听对象
+        var clickListener = AMap.event.addListener(placeSearch, "complete", onSearch); //绑定事件，返回监听对象
 
-    placeSearch.search(data);
+        placeSearch.search(data);
+
+
+    });
+    return p;
+
 }
 
 function createTitle(data) {
@@ -277,31 +240,68 @@ $(function () {
     });
 
     $("[name='my-checkbox']").on('switchChange.bootstrapSwitch', function (e, state) {
-
-        console.log(state);
-
+        //console.log(state);
         createTitle(pos_data);
-
     });
 
     $(".pushdata").on("click",function(e){
         site = $("#one").val();
-        geocoder(site);
 
-        /*amap.getCity(function(result){
-           city = result.city;
-        });*/
+        var p1 = new Promise(function (resolve, reject) {
+            resolve(site);
+        });
+        p1.then(geocoder).then(function (data) {
+            var p = new Promise(function (resolve, reject){
+                data.getCity(function(result){
+                    city = result.citycode;
+                    resolve(city);
+                });
+            });
+            return p;
 
+        }).then(function (data) {
+            console.log(data);
+            if ($("#two").val()!="") {
+                //alert('aaa');
+                $.ajax({
+                    type: "POST",
+                    url: window.location.protocol + '//' + window.location.host + '/index.php/index/index/get',
+                    data: {
+                        "two": $("#two").val(),
+                        "city": data
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.response == "success") {
+                            //console.log(data.data);
+                            //createTitle(data.data);
+                            pos_data = data.data;
+                            $("[name='my-checkbox']").bootstrapSwitch('disabled', false, false);
+                            createVisualMap(data.data);
+                            //setlist(data.data);
+                        } else {
+
+                        }
+                    },
+                    error: function (jqXHR, textStatus) {
+                        alert(jqXHR.status + ':' + jqXHR.statusText);
+                    },
+                    complete: function () {
+
+                    }
+                });
+
+            }
+
+        });
+
+
+        //geocoder(site);
 
 
 
     });
-
-    //geocoder();
-
-
-
-
 
 });
 

@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>户外广告点位查询系统</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
+<link href="public/css/base.css" rel="stylesheet" type="text/css">
+<link href="public/css/login.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div class="login">
+<form action="1.php" method="post" id="form">
+	<div class="logo"></div>
+    <div class="login_form">
+    	<div class="user">
+        	<input class="text_value" value="" name="username" type="text" id="username" nullmsg="请输入用户名！">
+            <input class="text_value" value="" name="password" type="password" id="password">
+        </div>
+        <button class="button" id="submit" type="submit">登录</button>
+    </div>
+	<div class="Validform_checktip"></div>
+	<span id="msgdemo2" style="margin-left:30px;"></span>
+    <div id="tip"></div>
+    <div class="foot">
+   
+    </div>
+    </form>
+</div>
+<script>var basedir='public/ui/';</script>
+<script src="public/ui/do.js"></script>
+<script src="public/ui/config.js"></script>
+<script>
+Do.ready('form', function() {
+	$("#form").Validform({
+			ajaxPost:true,
+			postonce:true,
+			tiptype:function(msg,o,cssctl){
+				if(!o.obj){
+					
+					var objtip=$(".Validform_checktip");
+					cssctl(objtip,o.type);
+					objtip.text(msg);
+				}else{
+					alert('aaa');
+					var objtip=o.obj.find("#tip");
+					cssctl(objtip,o.type);
+					if(o.type==2){
+						window.location.href='index.php?r=admin/index/index';
+					}else{
+						objtip.text(msg);
+					}
+				}
+			}
+	});
+});
+
+</script>
+</body>
+</html>

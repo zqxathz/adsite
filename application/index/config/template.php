@@ -14,6 +14,7 @@ return [
 		'__HOME__' => '/static/home',
 		'__HOME_CSS__' => '/static/home/css',
 		'__HOME_JS__' => '/static/home/js',
+        '__HOME_PUBLIC__' =>'/static/home/public'
 
 	]
 ];
