@@ -13,10 +13,15 @@ class Index extends Controller
 
 
 
+
         header("Content-type: text/html; charset=utf-8");
 
-        if (empty($data) || $islogin!=1)
-            return $this->fetch($template);
+	    if ($islogin!=1){
+		    $template= 'login';
+	    } elseif ($islogin==1){
+		    $template='index';
+	    }
+	    return $this->fetch($template);
 
 
     }

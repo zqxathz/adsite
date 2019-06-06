@@ -45,6 +45,8 @@
             callback:function(data){
                 if (data.status=='n'){
                     $("#msgdemo2").text('用户名或者密码错误!');
+                }else{
+                    window.location.href='/index.html';
                 }
             }
             /*tiptype:function(msg,o,cssctl){
