@@ -5,16 +5,18 @@ use think\Controller;
 
 class Index extends Controller
 {
+    protected $user_list =[
+      'admin' => 'admin123',
+      'user' => 'user123'
+    ];
     public function index()
     {
+
+        header("Content-type: text/html; charset=utf-8");
         $template= 'login';
         $data = input();
         $islogin = session('islogin');
 
-
-
-
-        header("Content-type: text/html; charset=utf-8");
 
 	    if ($islogin!=1){
 		    $template= 'login';
@@ -34,9 +36,13 @@ class Index extends Controller
         ];
 
         session('islogin',null);
-        if ($data['username']=='admin' && $data['password']=='admin'){
-            $info['status']='y';
-            session('islogin',1);
+
+        foreach ($this->user_list as $key=>$item) {
+            if (strtolower($data['username'])==$key && strtolower($data['password'])==$item){
+                $info['status']='y';
+                session('islogin',1);
+                break;
+            }
         }
         return json($info);
     }
